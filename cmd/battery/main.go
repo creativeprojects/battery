@@ -24,9 +24,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"text/tabwriter"
 	"time"
 
-	"github.com/distatus/battery"
+	"github.com/creativeprojects/battery"
 )
 
 func printBattery(idx int, bat *battery.Battery) {
@@ -73,11 +74,14 @@ func main() {
 		os.Exit(1)
 	}
 	errs, partialErrs := err.(battery.Errors)
-	for i, bat := range batteries {
+	w := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', tabwriter.AlignRight)
+	fmt.Fprintf(w, "Battery\tStatus\tCurrent capacity\tFull capacity\tDesign Capacity\tCharge Rate\tVoltage\t\n")
+	for i, batt := range batteries {
 		if partialErrs && errs[i] != nil {
 			fmt.Fprintf(os.Stderr, "Error getting info for BAT%d: %s\n", i, errs[i])
 			continue
 		}
-		printBattery(i, bat)
+		fmt.Fprintf(w, "#%d\t%s\t%.2f mWh\t%.2f mWh\t%.2f mWh\t%.2f mWh\t%.2f V\t\n", i, batt.State, batt.Current, batt.Full, batt.Design, batt.ChargeRate, batt.Voltage)
 	}
+	w.Flush()
 }

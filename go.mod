@@ -1,4 +1,4 @@
-module github.com/distatus/battery
+module github.com/creativeprojects/battery
 
 go 1.18
 
