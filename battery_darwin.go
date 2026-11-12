@@ -38,6 +38,27 @@ type battery struct {
 	FullyCharged      bool
 	IsCharging        bool
 	ExternalConnected bool
+	// macOS 27 only publishes the raw capacities in this nested dictionary.
+	BatteryData batteryData
+}
+
+type batteryData struct {
+	CurrentCapacity int `plist:"AppleRawCurrentCapacity"`
+	MaxCapacity     int `plist:"AppleRawMaxCapacity"`
+	DesignCapacity  int
+}
+
+// fillCapacities falls back to BatteryData for capacities missing at the top level.
+func (b *battery) fillCapacities() {
+	if b.CurrentCapacity == 0 {
+		b.CurrentCapacity = b.BatteryData.CurrentCapacity
+	}
+	if b.MaxCapacity == 0 {
+		b.MaxCapacity = b.BatteryData.MaxCapacity
+	}
+	if b.DesignCapacity == 0 {
+		b.DesignCapacity = b.BatteryData.DesignCapacity
+	}
 }
 
 func readBatteries() ([]*battery, error) {
@@ -45,15 +66,24 @@ func readBatteries() ([]*battery, error) {
 	if err != nil {
 		return nil, err
 	}
+	return parseBatteries(out)
+}
 
-	if len(out) == 0 {
+func parseBatteries(raw []byte) ([]*battery, error) {
+	var (
+		data []*battery
+		err  error
+	)
+	if len(raw) == 0 {
 		// No batteries.
-		return nil, nil
+		return data, nil
 	}
 
-	var data []*battery
-	if _, err = plist.Unmarshal(out, &data); err != nil {
+	if _, err = plist.Unmarshal(raw, &data); err != nil {
 		return nil, err
+	}
+	for _, b := range data {
+		b.fillCapacities()
 	}
 	return data, nil
 }
