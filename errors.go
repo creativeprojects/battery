@@ -21,6 +21,8 @@
 
 package battery
 
+import "strings"
+
 import "fmt"
 
 // ErrNotFound variable represents battery not found error.
@@ -82,14 +84,15 @@ func (p ErrPartial) Error() string {
 		"DesignVoltage": p.DesignVoltage,
 	}
 	keys := []string{"State", "Current", "Full", "Design", "ChargeRate", "Voltage", "DesignVoltage"}
-	s := "{"
+	var s strings.Builder
+	s.WriteString("{")
 	for _, name := range keys {
 		err := errors[name]
 		if err != nil {
-			s += fmt.Sprintf("%s:%s ", name, err.Error())
+			s.WriteString(fmt.Sprintf("%s:%s ", name, err.Error()))
 		}
 	}
-	return s[:len(s)-1] + "}"
+	return s.String()[:len(s.String())-1] + "}"
 }
 
 func (p ErrPartial) isNil() bool {
