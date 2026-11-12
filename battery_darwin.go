@@ -30,6 +30,7 @@ import (
 )
 
 type battery struct {
+	BatteryInstalled  bool
 	Voltage           int
 	CurrentCapacity   int `plist:"AppleRawCurrentCapacity"`
 	MaxCapacity       int `plist:"AppleRawMaxCapacity"`
@@ -121,8 +122,19 @@ func convertBattery(battery *battery) *Battery {
 	return b
 }
 
+func convertBatteries(source []*battery) []*Battery {
+	batteries := make([]*Battery, 0, len(source))
+	for _, battery := range source {
+		if !battery.BatteryInstalled {
+			continue
+		}
+		batteries = append(batteries, convertBattery(battery))
+	}
+	return batteries
+}
+
 func systemGet(idx int) (*Battery, error) {
-	batteries, err := readBatteries()
+	batteries, err := systemGetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +142,7 @@ func systemGet(idx int) (*Battery, error) {
 	if idx >= len(batteries) {
 		return nil, ErrNotFound
 	}
-	return convertBattery(batteries[idx]), nil
+	return batteries[idx], nil
 }
 
 func systemGetAll() ([]*Battery, error) {
@@ -139,9 +151,5 @@ func systemGetAll() ([]*Battery, error) {
 		return nil, err
 	}
 
-	batteries := make([]*Battery, len(_batteries))
-	for i, battery := range _batteries {
-		batteries[i] = convertBattery(battery)
-	}
-	return batteries, nil
+	return convertBatteries(_batteries), nil
 }

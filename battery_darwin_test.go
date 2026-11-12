@@ -13,16 +13,24 @@ func TestParseBatteries(t *testing.T) {
 	tests := []struct {
 		name     string
 		testdata string
+		found    int
 		state    AgnosticState
 	}{
 		{
+			name:     "mac os 26 - no battery installed",
+			testdata: "macos26_nobattery.xml",
+			found:    0,
+		},
+		{
 			name:     "mac os 27 - charging",
 			testdata: "macos27_charging.xml",
+			found:    1,
 			state:    Charging,
 		},
 		{
 			name:     "mac os 27 - discharging",
 			testdata: "macos27_discharging.xml",
+			found:    1,
 			state:    Discharging,
 		},
 	}
@@ -30,11 +38,15 @@ func TestParseBatteries(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			raw, err := os.ReadFile(filepath.Join("testdata", tt.testdata))
 			require.NoError(t, err)
+
 			darwinBatteries, err := parseBatteries(raw)
 			require.NoError(t, err)
-			require.Len(t, darwinBatteries, 1)
-			battery := convertBattery(darwinBatteries[0])
-			assert.Equal(t, tt.state, battery.State.Raw)
+
+			batteries := convertBatteries(darwinBatteries)
+			require.Len(t, batteries, tt.found)
+			if tt.found == 1 {
+				assert.Equal(t, tt.state, batteries[0].State.Raw)
+			}
 		})
 	}
 }
