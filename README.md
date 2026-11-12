@@ -1,4 +1,4 @@
-battery [![Build Status](https://github.com/creativeprojects/battery/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/creativeprojects/battery/actions/workflows/tests.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/creativeprojects/battery)](https://goreportcard.com/report/github.com/creativeprojects/battery) [![GoDoc](https://pkg.go.dev/badge/github.com/creativeprojects/battery)](https://pkg.go.dev/github.com/creativeprojects/battery)
+battery [![GoDoc](https://pkg.go.dev/badge/github.com/creativeprojects/battery)](https://pkg.go.dev/github.com/creativeprojects/battery)
 =======
 
 Cross-platform, normalized battery information library.
