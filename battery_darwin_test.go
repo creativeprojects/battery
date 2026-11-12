@@ -33,6 +33,12 @@ func TestParseBatteries(t *testing.T) {
 			found:    1,
 			state:    Discharging,
 		},
+		{
+			name:     "mac os 27 - full",
+			testdata: "macos27_full.xml",
+			found:    1,
+			state:    Full,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
