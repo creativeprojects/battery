@@ -25,9 +25,9 @@
 //
 // Currently supported systems:
 //
-//	Linux 2.6.39+
-//	OS X 10.10+
-//	Windows XP+
+//	Linux
+//	macOS
+//	Windows
 //	FreeBSD
 //	DragonFlyBSD
 //	NetBSD

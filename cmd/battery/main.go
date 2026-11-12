@@ -25,43 +25,9 @@ import (
 	"fmt"
 	"os"
 	"text/tabwriter"
-	"time"
 
 	"github.com/creativeprojects/battery"
 )
-
-func printBattery(idx int, bat *battery.Battery) {
-	fmt.Printf(
-		"BAT%d: %s, %.2f%%",
-		idx,
-		bat.State,
-		bat.Current/bat.Full*100,
-	)
-	defer fmt.Printf(" [Voltage: %.2fV (design: %.2fV)]\n", bat.Voltage, bat.DesignVoltage)
-
-	var str string
-	var timeNum float64
-	switch bat.State.Raw {
-	case battery.Discharging:
-		if bat.ChargeRate == 0 {
-			fmt.Print(", discharging at zero rate - will never fully discharge")
-			return
-		}
-		str = "remaining"
-		timeNum = bat.Current / bat.ChargeRate
-	case battery.Charging:
-		if bat.ChargeRate == 0 {
-			fmt.Print(", charging at zero rate - will never fully charge")
-			return
-		}
-		str = "until charged"
-		timeNum = (bat.Full - bat.Current) / bat.ChargeRate
-	default:
-		return
-	}
-	duration, _ := time.ParseDuration(fmt.Sprintf("%fh", timeNum))
-	fmt.Printf(", %s %s", duration, str)
-}
 
 func main() {
 	batteries, err := battery.GetAll()
@@ -81,7 +47,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error getting info for BAT%d: %s\n", i, errs[i])
 			continue
 		}
-		fmt.Fprintf(w, "#%d\t%s\t%.2f mWh\t%.2f mWh\t%.2f mWh\t%.2f mWh\t%.2f V\t\n", i, batt.State, batt.Current, batt.Full, batt.Design, batt.ChargeRate, batt.Voltage)
+		fmt.Fprintf(w, "#%d\t%s\t%.2f mWh\t%.2f mWh\t%.2f mWh\t%.2f mW\t%.2f V\t\n", i, batt.State, batt.Current, batt.Full, batt.Design, batt.ChargeRate, batt.Voltage)
 	}
 	w.Flush()
 }
